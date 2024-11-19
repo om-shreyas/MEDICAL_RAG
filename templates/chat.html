@@ -69,6 +69,28 @@
         #input-section button:hover {
             background-color: #0056b3;
         }
+
+        #loading-spinner {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border: 4px solid transparent;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
@@ -77,11 +99,13 @@
         <input type="text" id="user-input" placeholder="Type your message...">
         <button id="send-btn">Send</button>
     </div>
+    <div id="loading-spinner"></div>
 
     <script>
         const chatWindow = document.getElementById('chat-window');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
+        const loadingSpinner = document.getElementById('loading-spinner');
 
         const appendMessage = (text, isUser = true) => {
             const messageDiv = document.createElement('div');
@@ -91,6 +115,10 @@
             chatWindow.scrollTop = chatWindow.scrollHeight;
         };
 
+        const toggleLoading = (isLoading) => {
+            loadingSpinner.style.display = isLoading ? "block" : "none";
+        };
+
         const sendMessage = async () => {
             const query = userInput.value.trim();
             if (!query) return;
@@ -98,15 +126,23 @@
             appendMessage(query, true);
             userInput.value = "";
 
-            const response = await fetch("/get_response", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ query })
-            });
-            const data = await response.json();
-            appendMessage(data.response, false);
+            toggleLoading(true); // Show loading spinner
+
+            try {
+                const response = await fetch("/get_response", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ query })
+                });
+                const data = await response.json();
+                appendMessage(data.response, false);
+            } catch (error) {
+                appendMessage("Error fetching response. Please try again later.", false);
+            } finally {
+                toggleLoading(false); // Hide loading spinner
+            }
         };
 
         sendBtn.addEventListener('click', sendMessage);
