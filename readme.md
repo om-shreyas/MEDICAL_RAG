@@ -51,6 +51,25 @@ This project provides a Retrieval-Augmented Generation (RAG) model designed to q
    pip install -r requirements.txt  
    ```  
 
+4. **Install Ollama**:  
+   Ollama is required to manage the embedding and language models. Install it using:  
+   ```bash
+   curl -fsSL https://ollama.com/install.sh | sh  
+   ```  
+
+5. **Pull Required Models**:  
+   Fetch the `mistral` and `nomic-embed-text` models using Ollama:  
+   ```bash
+   ollama pull mistral  
+   ollama pull nomic-embed-text  
+   ```  
+
+6. **Verify Model Availability**:  
+   Ensure the models are successfully installed:  
+   ```bash
+   ollama list  
+   ```  
+
 ---
 
 ## File Structure  
